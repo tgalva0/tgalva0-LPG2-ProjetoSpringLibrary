@@ -31,17 +31,18 @@ public class EmprestimoService {
         this.livroRepository = livroRepository;
     }
 
-    @Transactional // Essencial! Múltiplas operações no banco.
-    public EmprestimoDTO realizarEmprestimo(EmprestimoCreateDTO dto) {
+    @Transactional
+    // --- ASSINATURA ATUALIZADA ---
+    // Removemos o DTO e recebemos os dados "puros"
+    public EmprestimoDTO realizarEmprestimo(Long livroId, Usuario usuarioLogado) {
 
         // --- LÓGICA DE NEGÓCIO ---
 
-        // 1. Validar Usuário
-        Usuario usuario = usuarioRepository.findById(dto.getUsuarioId())
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
+        // 1. Validar Usuário (Já temos o objeto! Não precisamos buscar)
+        // Usuario usuario = usuarioRepository.findById(dto.getUsuarioId())... (PODE APAGAR ISSO)
 
         // 2. Validar Livro
-        Livro livro = livroRepository.findById(dto.getLivroId())
+        Livro livro = livroRepository.findById(livroId)
                 .orElseThrow(() -> new RuntimeException("Livro não encontrado."));
 
         // 3. REGRA: Verificar se o livro está disponível
@@ -49,32 +50,27 @@ public class EmprestimoService {
             throw new RuntimeException("Livro sem estoque disponível.");
         }
 
-        // 4. REGRA: Verificar se o usuário já tem muitos livros (ex: limite de 3)
+        // 4. REGRA: Verificar limite de livros (agora usa o 'usuarioLogado')
         long emprestimosAtivos = emprestimoRepository
-                .findByUsuarioAndDataDevolucaoEfetivaIsNull(usuario).size();
+                .findByUsuarioAndDataDevolucaoEfetivaIsNull(usuarioLogado).size(); // Usa o objeto
 
         if (emprestimosAtivos >= 3) {
             throw new RuntimeException("Usuário atingiu o limite de 3 empréstimos ativos.");
         }
 
-        // --- FIM DA LÓGICA ---
-
         // 5. Atualizar o livro
         livro.setQuantidadeDisponivel(livro.getQuantidadeDisponivel() - 1);
-        livroRepository.save(livro); // Salva a quantidade atualizada
+        livroRepository.save(livro);
 
         // 6. Criar o Empréstimo
         Emprestimo novoEmprestimo = new Emprestimo();
-        novoEmprestimo.setUsuario(usuario);
+        novoEmprestimo.setUsuario(usuarioLogado); // Usa o objeto
         novoEmprestimo.setLivro(livro);
         novoEmprestimo.setDataEmprestimo(LocalDate.now());
-        novoEmprestimo.setDataDevolucaoPrevista(LocalDate.now().plusDays(7)); // Regra: 7 dias
-        novoEmprestimo.setDataDevolucaoEfetiva(null); // Ainda não foi devolvido
+        novoEmprestimo.setDataDevolucaoPrevista(LocalDate.now().plusDays(7));
+        novoEmprestimo.setDataDevolucaoEfetiva(null);
 
-        // 7. Salvar o Empréstimo
         Emprestimo emprestimoSalvo = emprestimoRepository.save(novoEmprestimo);
-
-        // 8. Retornar o DTO
         return new EmprestimoDTO(emprestimoSalvo);
     }
 

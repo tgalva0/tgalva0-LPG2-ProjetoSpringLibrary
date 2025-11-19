@@ -14,6 +14,8 @@ public interface EmprestimoRepository extends JpaRepository<Emprestimo, Long> {
     // "SELECT e FROM Emprestimo e WHERE e.usuario = ?1"
     List<Emprestimo> findByUsuario(Usuario usuario);
 
+    List<Emprestimo> findByLivroId(Long livroId);
+
     // Busca empréstimos de um usuário que ainda não foram devolvidos
     // "SELECT e FROM Emprestimo e WHERE e.usuario = ?1 AND e.dataDevolucaoEfetiva IS NULL"
     List<Emprestimo> findByUsuarioAndDataDevolucaoEfetivaIsNull(Usuario usuario);

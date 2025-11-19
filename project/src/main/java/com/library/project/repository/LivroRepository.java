@@ -18,4 +18,6 @@ public interface LivroRepository extends JpaRepository<Livro, Long> {
 
     // "SELECT l FROM Livro l WHERE l.isbn = ?1"
     Optional<Livro> findByIsbn(String isbn);
+
+    List<Livro> findByTituloContainingIgnoreCaseOrAutorContainingIgnoreCase(String termoTitulo, String termoAutor);
 }

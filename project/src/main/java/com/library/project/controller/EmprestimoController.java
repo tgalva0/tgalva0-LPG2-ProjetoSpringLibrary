@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.library.project.model.Usuario;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 @RestController
 @RequestMapping("/api/emprestimos")
@@ -21,8 +23,12 @@ public class EmprestimoController {
     }
 
     @PostMapping
-    public ResponseEntity<EmprestimoDTO> realizarEmprestimo(@Valid @RequestBody EmprestimoCreateDTO dto) {
-        EmprestimoDTO novoEmprestimo = emprestimoService.realizarEmprestimo(dto);
+    public ResponseEntity<EmprestimoDTO> realizarEmprestimo(
+            @Valid @RequestBody EmprestimoCreateDTO dto,
+            @AuthenticationPrincipal Usuario usuarioLogado) { // <-- O Spring injeta o usuário do token aqui
+
+        // O Service agora recebe o ID do livro e o objeto do usuário
+        EmprestimoDTO novoEmprestimo = emprestimoService.realizarEmprestimo(dto.getLivroId(), usuarioLogado);
         return new ResponseEntity<>(novoEmprestimo, HttpStatus.CREATED);
     }
 

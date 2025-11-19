@@ -1,0 +1,210 @@
+/* CSS Principal - src/App.css */
+.wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center; /* Centraliza verticalmente */
+  min-height: 100vh;
+  padding: 20px;
+}
+
+/* O "card" agora é um container maior */
+.card {
+  background-color: #ffffff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 450px;
+  transition: max-width 0.4s ease-in-out;
+}
+
+/* Quando logado, o card se expande */
+.card.logged-in {
+  max-width: 1200px;
+  /* --- CORREÇÃO 1: REMOVIDAS AS LINHAS ABAIXO --- */
+  /* align-self: flex-start;  <-- REMOVIDO */
+  /* margin-top: 20px;      <-- REMOVIDO */
+  /* Agora o card logado também será centralizado */
+}
+
+h1, h2, h3, h4 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid #eee;
+  margin: 1.5rem 0;
+}
+
+/* --- Layout da Página Logada --- */
+.main-content-area {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px; /* Espaço entre as colunas */
+}
+
+.search-and-results {
+  flex: 2;
+  min-width: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-panel {
+  flex: 1;
+  min-width: 350px;
+  background-color: #f9f9f9;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #eee;
+  align-self: flex-start;
+  margin-left: 10px;
+  margin-top: 10px;
+}
+
+/* --- Header e Sessão --- */
+.app-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+  gap: 15px;
+}
+
+.user-session {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.user-info {
+  font-weight: bold;
+  color: #333;
+}
+
+/* --- Barra de Busca e Lista --- */
+.search-bar {
+  margin-bottom: 1.5rem;
+}
+
+.search-bar input {
+  width: 100%;
+  padding: 12px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.results-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.results-list li {
+  background-color: #fafafa;
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+.results-list li:first-child { border-top: 1px solid #eee; }
+.results-list li span { font-style: italic; color: #555; font-size: 0.9rem; }
+.results-list .button-group { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* --- Formulários (Grupos de Input) --- */
+.input-group { margin-bottom: 1rem; }
+.input-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+.input-group input[type="text"],
+.input-group input[type="password"],
+.input-group input[type="number"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+/* --- Papéis (Radio Buttons) --- */
+.role-radio-group {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 1rem;
+}
+.role-radio-group label {
+  font-weight: normal;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* --- Botões --- */
+.button-primary {
+  width: 100%;
+  padding: 12px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.button-primary:hover { background-color: #0056b3; }
+
+.button-logout {
+  background-color: #d93025;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: bold;
+  transition: background-color 0.2s;
+  margin-top: 5px;
+}
+.button-logout:hover { background-color: #b0261e; }
+
+/* Botão de Retorno */
+.button-return {
+  background: none;
+  border: none;
+  color: #007bff;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 0;
+  margin-bottom: 1rem;
+}
+.button-return:hover { text-decoration: underline; }
+
+/* (Botões de Emprestar, Devolver, Editar, Excluir) */
+.button-emprestar { background-color: #28a745; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 0.9rem; font-weight: bold; transition: background-color 0.2s; }
+.button-emprestar:hover { background-color: #218838; }
+.button-devolver { background-color: #ffc107; color: #212529; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 0.9rem; font-weight: bold; transition: background-color 0.2s; }
+.button-devolver:hover { background-color: #e0a800; }
+.button-editar { background-color: #17a2b8; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 0.9rem; font-weight: bold; transition: background-color 0.2s; }
+.button-editar:hover { background-color: #117a8b; }
+.button-excluir { background-color: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 0.9rem; font-weight: bold; transition: background-color 0.2s; }
+.button-excluir:hover { background-color: #c82333; }
+
+/* --- Mensagens e Modal --- */
+.error-message { color: #d93025; text-align: center; margin-top: 1rem; }
+.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+.modal-content { background-color: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); width: 100%; max-width: 500px; z-index: 1001; }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+.modal-header h3 { margin: 0; }
+.modal-close-button { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #888; }
+.modal-body .input-group { margin-bottom: 1rem; }

@@ -1,6 +1,6 @@
-package com.library.project.config;
+package com.library.project.config; // Pacote baseado no seu log de erro
 
-import com.library.project.security.SecurityFilter;
+import com.library.project.security.SecurityFilter; // Ajuste o import se seu pacote for outro
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +15,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
 import java.util.Arrays;
 
 @Configuration
@@ -28,15 +29,25 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Configuração do CORS
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 .authorizeHttpRequests(auth -> auth
+                        // --- A ORDEM CORRETA COMEÇA AQUI ---
+
+                        // 1. Rotas Públicas (não precisam de token)
                         .requestMatchers("/api/auth/login").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
+
+                        // 2. Rotas de Admin (precisam de token E papel "ADMIN")
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/livros").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/livros/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/livros/**").hasRole("ADMIN")
+
+                        // 3. A REGRA "PEGA-TUDO" (DEVE SER A ÚLTIMA)
+                        // Qualquer outra requisição (ex: GET /api/livros/search)
+                        // só precisa de um token válido (authenticated)
                         .anyRequest().authenticated()
                 )
 
@@ -50,18 +61,22 @@ public class SecurityConfig {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
+    // Bean do CORS que criamos anteriormente (para o React)
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
+
         configuration.setAllowedOrigins(Arrays.asList(
-                "http://localhost:3000",
-                "http://localhost:5173"
+                "http://localhost:3000", // Frontend React (Vite/Create-React-App)
+                "http://localhost:5173"  // Frontend React (Vite)
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
         configuration.setAllowCredentials(true);
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
+
         return source;
     }
 }

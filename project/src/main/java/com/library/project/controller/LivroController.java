@@ -1,10 +1,13 @@
 package com.library.project.controller;
 import com.library.project.dto.LivroDTO;
+import com.library.project.dto.LivroComStatusDTO;
+import com.library.project.model.Usuario;
 import com.library.project.service.LivroService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -48,5 +51,15 @@ public class LivroController {
     public ResponseEntity<Void> deletarLivro(@PathVariable Long id) {
         livroService.deletarLivro(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<LivroComStatusDTO>> buscarLivros(
+            @RequestParam("q") String termo,
+            @AuthenticationPrincipal Usuario usuarioLogado) { // 1. Pegue o usuário logado
+
+        // 2. Passe o termo E o usuário para o serviço
+        List<LivroComStatusDTO> resultado = livroService.buscarPorTermo(termo, usuarioLogado);
+        return ResponseEntity.ok(resultado);
     }
 }

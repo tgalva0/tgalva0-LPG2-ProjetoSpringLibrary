@@ -1,12 +1,20 @@
 package com.library.project.service;
 
 import com.library.project.dto.LivroDTO;
+import com.library.project.dto.LivroComStatusDTO;
+import com.library.project.model.Emprestimo;
 import com.library.project.model.Livro;
 import com.library.project.repository.LivroRepository;
+import com.library.project.model.Usuario;
+import com.library.project.repository.EmprestimoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional; 
+import com.library.project.model.Emprestimo; 
+import java.util.List; 
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -14,10 +22,12 @@ public class LivroService {
 
     // 1. Injeção de Dependência (Melhor Prática: Construtor)
     private final LivroRepository livroRepository;
+    private final EmprestimoRepository emprestimoRepository;
 
     @Autowired
-    public LivroService(LivroRepository livroRepository) {
+    public LivroService(LivroRepository livroRepository, EmprestimoRepository emprestimoRepository) {
         this.livroRepository = livroRepository;
+        this.emprestimoRepository = emprestimoRepository;
     }
 
     // 2. Método de Busca por ID
@@ -52,19 +62,49 @@ public class LivroService {
     }
 
     // 5. Método de Deletar
+    @Transactional // IMPORTANTE: Garante que tudo execute como uma única operação
     public void deletarLivro(Long id) {
+        // 1. Verifica se o livro existe
         Livro livro = livroRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Livro não encontrado. ID: " + id));
 
-        // Lógica de Negócio: Ex: Não deixar deletar livro com empréstimos ativos
-        // (Adicionaremos isso quando o EmprestimoService existir)
+        // 2. REGRA DE NEGÓCIO: Verifica se há empréstimos ATIVOS
+        if (!emprestimoRepository.findByLivroIdAndDataDevolucaoEfetivaIsNull(id).isEmpty()) {
+            throw new RuntimeException("Não é possível excluir: este livro possui empréstimos ativos.");
+        }
 
+        // 3. Se não há empréstimos ativos, apaga o histórico de empréstimos passados
+        // (Usando o método que acabamos de adicionar no EmprestimoRepository)
+        List<Emprestimo> emprestimosPassados = emprestimoRepository.findByLivroId(id);
+        emprestimoRepository.deleteAll(emprestimosPassados);
+
+        // 4. Agora que não há mais referências, deleta o livro
         livroRepository.delete(livro);
     }
 
+    public List<LivroComStatusDTO> buscarPorTermo(String termo, Usuario usuarioLogado) {
 
-    // --- MÉTODOS "MAPPERS" PRIVADOS ---
-    // (Converte DTO <-> Entidade)
+        // Passo A: Busca os livros (como antes)
+        List<Livro> livros = livroRepository.findByTituloContainingIgnoreCaseOrAutorContainingIgnoreCase(termo, termo);
+
+        // Passo B: Busca os empréstimos ATIVOS do usuário
+        List<Emprestimo> emprestimosAtivos = emprestimoRepository.findByUsuarioAndDataDevolucaoEfetivaIsNull(usuarioLogado);
+
+        // Passo C: Mapeia (LivroID -> EmprestimoID) para consulta rápida
+        Map<Long, Long> mapaLivroEmprestimo = emprestimosAtivos.stream()
+                .collect(Collectors.toMap(
+                        e -> e.getLivro().getId(), // Chave: ID do Livro
+                        Emprestimo::getId         // Valor: ID do Empréstimo
+                ));
+
+        // Passo D: Constrói o DTO "inteligente"
+        return livros.stream()
+                .map(livro -> new LivroComStatusDTO(
+                        livro,
+                        mapaLivroEmprestimo.get(livro.getId()) // Retorna o ID do empréstimo (ou null)
+                ))
+                .collect(Collectors.toList());
+    }
 
     private LivroDTO toDTO(Livro entidade) {
         return new LivroDTO(

@@ -22,17 +22,30 @@ public class DataLoader {
                                   LivroRepository livroRepository,
                                   PasswordEncoder passwordEncoder) {
         return args -> {
+            // 1. Create Roles
             Role roleAdmin = new Role(); roleAdmin.setNome("ROLE_ADMIN");
             Role roleComum = new Role(); roleComum.setNome("ROLE_COMUM");
             roleRepository.saveAll(Arrays.asList(roleAdmin, roleComum));
 
+            // 2. Create Test User (Student)
             Usuario user = new Usuario();
             user.setNomeCompleto("Aluno Exemplo");
             user.setUsername("aluno");
-            user.setPassword(passwordEncoder.encode("123456"));
+            user.setPassword(passwordEncoder.encode("123456")); // Senha hash
             user.addRole(roleComum);
-            usuarioRepository.save(user);
 
+            // 3. --- NOVO USUÁRIO ADMIN ---
+            Usuario admin = new Usuario();
+            admin.setNomeCompleto("Admin da Biblioteca");
+            admin.setUsername("admin");
+            admin.setPassword(passwordEncoder.encode("admin123")); // Senha hash
+            admin.addRole(roleAdmin); // <- Papel de Admin
+            admin.addRole(roleComum); // <- Também é um usuário comum
+
+            // 4. Save both users
+            usuarioRepository.saveAll(Arrays.asList(user, admin));
+
+            // 5. Create Books (as before)
             Livro livro1 = new Livro();
             livro1.setTitulo("Clean Code");
             livro1.setAutor("Robert C. Martin");
@@ -43,11 +56,11 @@ public class DataLoader {
             livro2.setTitulo("Arquitetura Limpa");
             livro2.setAutor("Robert C. Martin");
             livro2.setIsbn("9780134494166");
-            livro2.setQuantidadeDisponivel(0);
+            livro2.setQuantidadeDisponivel(1); // Mudei para 1 para facilitar testes
 
             livroRepository.saveAll(Arrays.asList(livro1, livro2));
 
-            System.out.println("--- DADOS DE TESTE CARREGADOS ---");
+            System.out.println("--- DADOS DE TESTE CARREGADOS (com Admin) ---");
         };
     }
 }
