@@ -1,5 +1,6 @@
 package com.library.project.service;
 
+import com.library.project.dto.AdminUsuarioUpdateDTO;
 import com.library.project.dto.UsuarioCreateDTO;
 import com.library.project.dto.UsuarioDTO;
 import com.library.project.model.Role;
@@ -12,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.library.project.dto.AdminUsuarioCreateDTO;
+import com.library.project.dto.PasswordChangeDTO;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -71,6 +73,52 @@ public class UsuarioService {
 
         // 7. Retornar o DTO (sem a senha)
         return new UsuarioDTO(usuarioSalvo);
+    }
+
+    @Transactional(readOnly = true)
+    public List<UsuarioDTO> buscarPorUsername(String termo, Usuario adminLogado) {
+        // Busca usuários que contenham o termo, exceto o próprio admin
+        return usuarioRepository.findByUsernameContainingIgnoreCaseAndIdNot(termo, adminLogado.getId())
+                .stream()
+                .map(UsuarioDTO::new)
+                .collect(Collectors.toList());
+    }
+
+    // --- MÉTODO NOVO DE ATUALIZAÇÃO ---
+    @Transactional
+    public UsuarioDTO adminAtualizarUsuario(Long id, AdminUsuarioUpdateDTO dto) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
+
+        // Converte os nomes dos papéis (Strings) em Entidades Role
+        Set<Role> roles = dto.getRoles().stream()
+                .map(roleName -> roleRepository.findByNome(roleName)
+                        .orElseThrow(() -> new RuntimeException("Papel não encontrado: " + roleName)))
+                .collect(Collectors.toSet());
+
+        if (roles.isEmpty()) {
+            throw new RuntimeException("Um usuário deve ter pelo menos um papel.");
+        }
+
+        // Atualiza os dados
+        usuario.setNomeCompleto(dto.getNomeCompleto());
+        usuario.setRoles(roles);
+
+        Usuario usuarioSalvo = usuarioRepository.save(usuario);
+        return new UsuarioDTO(usuarioSalvo);
+    }
+
+    @Transactional
+    public void changePassword(Usuario usuarioLogado, PasswordChangeDTO dto) {
+
+        // 1. Verifica se a senha atual fornecida bate com a senha no banco
+        if (!passwordEncoder.matches(dto.getCurrentPassword(), usuarioLogado.getPassword())) {
+            throw new RuntimeException("Senha atual incorreta.");
+        }
+
+        // 2. Se bateu, codifica e salva a nova senha
+        usuarioLogado.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+        usuarioRepository.save(usuarioLogado);
     }
 
     @Transactional(readOnly = true)

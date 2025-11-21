@@ -9,13 +9,14 @@
 
 /* O "card" agora é um container maior */
 .card {
-  background-color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.66);
   padding: 2rem;
-  border-radius: 8px;
+  border-radius: 20px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 450px;
   transition: max-width 0.4s ease-in-out;
+  backdrop-filter: blur(20px);
 }
 
 /* Quando logado, o card se expande */
@@ -57,11 +58,10 @@ hr {
   min-width: 350px;
   background-color: #f9f9f9;
   padding: 1.5rem;
-  border-radius: 8px;
+  border-radius: 10px;
   border: 1px solid #eee;
   align-self: flex-start;
   margin-left: 10px;
-  margin-top: 10px;
 }
 
 /* --- Header e Sessão --- */
@@ -97,7 +97,7 @@ hr {
   padding: 12px;
   font-size: 1rem;
   border: 1px solid #ccc;
-  border-radius: 4px;
+  border-radius: 10px;
 }
 
 .results-list {
@@ -106,6 +106,7 @@ hr {
   padding: 0;
   max-height: 60vh;
   overflow-y: auto;
+  border-radius: 10px;
 }
 
 .results-list li {
@@ -131,7 +132,7 @@ hr {
   width: 100%;
   padding: 10px;
   border: 1px solid #ccc;
-  border-radius: 4px;
+  border-radius: 10px;
   font-size: 1rem;
 }
 
@@ -157,18 +158,22 @@ hr {
   color: #fff;
   background-color: #007bff;
   border: none;
-  border-radius: 4px;
+  border-radius: 10px;
   cursor: pointer;
   transition: background-color 0.2s;
 }
 .button-primary:hover { background-color: #0056b3; }
+
+.admin-panel button {
+  margin-top: 1rem;
+}
 
 .button-logout {
   background-color: #d93025;
   color: white;
   border: none;
   padding: 8px 12px;
-  border-radius: 4px;
+  border-radius: 10px;
   cursor: pointer;
   font-size: 0.9rem;
   font-weight: bold;
@@ -191,13 +196,13 @@ hr {
 .button-return:hover { text-decoration: underline; }
 
 /* (Botões de Emprestar, Devolver, Editar, Excluir) */
-.button-emprestar { background-color: #28a745; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 0.9rem; font-weight: bold; transition: background-color 0.2s; }
+.button-emprestar { background-color: #28a745; color: white; border: none; padding: 8px 12px; border-radius: 10px; cursor: pointer; font-size: 0.9rem; font-weight: bold; transition: background-color 0.2s; }
 .button-emprestar:hover { background-color: #218838; }
-.button-devolver { background-color: #ffc107; color: #212529; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 0.9rem; font-weight: bold; transition: background-color 0.2s; }
+.button-devolver { background-color: #ffc107; color: #212529; border: none; padding: 8px 12px; border-radius: 10px; cursor: pointer; font-size: 0.9rem; font-weight: bold; transition: background-color 0.2s; }
 .button-devolver:hover { background-color: #e0a800; }
-.button-editar { background-color: #17a2b8; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 0.9rem; font-weight: bold; transition: background-color 0.2s; }
+.button-editar { background-color: #17a2b8; color: white; border: none; padding: 8px 12px; border-radius: 10px; cursor: pointer; font-size: 0.9rem; font-weight: bold; transition: background-color 0.2s; }
 .button-editar:hover { background-color: #117a8b; }
-.button-excluir { background-color: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 0.9rem; font-weight: bold; transition: background-color 0.2s; }
+.button-excluir { background-color: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 10px; cursor: pointer; font-size: 0.9rem; font-weight: bold; transition: background-color 0.2s; }
 .button-excluir:hover { background-color: #c82333; }
 
 /* --- Mensagens e Modal --- */
@@ -208,3 +213,116 @@ hr {
 .modal-header h3 { margin: 0; }
 .modal-close-button { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #888; }
 .modal-body .input-group { margin-bottom: 1rem; }
+
+.admin-user-list {
+  list-style: none;
+  margin: 1.5rem 0 0 0;
+  padding: 0;
+  max-height: 40vh;
+  overflow-y: auto;
+}
+
+.admin-user-list li {
+  background-color: #fdfdfd;
+  padding: 10px 12px;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-user-list .user-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-user-list .user-details strong {
+  font-size: 1rem;
+  color: #333;
+}
+
+.admin-user-list .user-details span {
+  font-size: 0.85rem;
+  color: #777;
+}
+
+.user-session-buttons {
+  display: flex;
+  gap: 10px; /* Espaço entre os botões */
+  margin-top: 5px;
+}
+
+.button-changepw {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: bold;
+  transition: background-color 0.2s;
+  margin-top: 5px;
+}
+.button-changepw:hover {
+  background-color: #0056b3;
+}
+
+
+.user-dashboard {
+  background-color: #fdfdfd;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.user-dashboard h4 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.5rem;
+}
+
+.user-dashboard .empty-message {
+  color: #555;
+  font-style: italic;
+}
+
+/* Lista de empréstimos (reutiliza o estilo da lista de resultados) */
+.user-dashboard .results-list {
+  max-height: 200px;
+  overflow-y: auto;
+  margin-top: 0;
+}
+
+/* --- Estilos do Modal de Estatísticas (Admin) --- */
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr; /* 3 colunas */
+  gap: 20px;
+}
+
+.stat-item {
+  background-color: #f4f4f4;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  border: 1px solid #ddd;
+}
+
+.stat-item .stat-value {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #007bff;
+}
+
+.stat-item .stat-label {
+  font-size: 1rem;
+  color: #333;
+  margin-top: 5px;
+}

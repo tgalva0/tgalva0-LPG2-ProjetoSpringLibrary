@@ -33,21 +33,13 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 .authorizeHttpRequests(auth -> auth
-                        // --- A ORDEM CORRETA COMEÇA AQUI ---
-
-                        // 1. Rotas Públicas (não precisam de token)
                         .requestMatchers("/api/auth/login").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
-
-                        // 2. Rotas de Admin (precisam de token E papel "ADMIN")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/livros").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/livros/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/livros/**").hasRole("ADMIN")
-
-                        // 3. A REGRA "PEGA-TUDO" (DEVE SER A ÚLTIMA)
-                        // Qualquer outra requisição (ex: GET /api/livros/search)
-                        // só precisa de um token válido (authenticated)
+                        .requestMatchers("/api/profile/**").authenticated()
                         .anyRequest().authenticated()
                 )
 
